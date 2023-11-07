@@ -1,0 +1,60 @@
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
+
+public class ZenodoArticleSearch {
+
+    public static void main(String[] args) {
+        String articleTitle = "cats"; // Replace with the title you want to search for
+
+        try {
+            String apiUrl = "https://zenodo.org/api/records/?q=" + articleTitle;
+
+            HttpClient httpClient = HttpClients.createDefault();
+            HttpGet request = new HttpGet(apiUrl);
+
+            HttpResponse response = httpClient.execute(request);
+
+            if (response.getStatusLine().getStatusCode() == 200) {
+                String jsonResponse = EntityUtils.toString(response.getEntity());
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode rootNode = objectMapper.readTree(jsonResponse);
+
+                if (rootNode.has("hits") && rootNode.get("hits").get("hits").isArray()) {
+                    ArrayNode hits = (ArrayNode) rootNode.get("hits").get("hits");
+
+                    if (hits.size() > 0) {
+                        for (JsonNode hit : hits) {
+                            if (hit.isObject() && hit.has("metadata")) {
+                                ObjectNode metadata = (ObjectNode) hit.get("metadata");
+                                if (metadata.has("title")) {
+                                    String articleName = metadata.get("title").asText();
+                                    System.out.println("Yes");
+                                    System.out.println("Article Name: " + articleName);
+                                }
+                            }
+                        }
+                    } else {
+                        System.out.println("No");
+                    }
+                } else {
+                    System.out.println("No 'hits' array found in JSON.");
+                }
+            } else {
+                System.out.println("API request failed with status code: " + response.getStatusLine().getStatusCode());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
