@@ -1,0 +1,3 @@
+- add the rest of the fields to the record class
+- add more options to search a record by (doi, date...)
+- add a class that will publish a record to zenodo
