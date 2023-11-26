@@ -71,7 +71,7 @@ public class File {
         this.links = links;
     }
 
-    // Links class
+    // Links class 
     public static class Links {
         private String self;
 
