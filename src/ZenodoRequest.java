@@ -1,12 +1,20 @@
 // Importing necessary classes and packages for the ZenodoRequest class
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hc.client5.http.classic.methods.*;
-import org.apache.hc.client5.http.classic.methods.multipart.MultipartEntityBuilder;
-import org.apache.hc.client5.http.classic.methods.multipart.entity.FileBody;
-import org.apache.hc.client5.http.classic.methods.multipart.entity.StringBody;
+import org.apache.hc.client5.http.entity.mime.FileBody;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.entity.mime.StringBody;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.http.client.methods.HttpPost;
 
 import java.io.File;
 import java.io.IOException;
@@ -97,7 +105,7 @@ public class ZenodoRequest {
         HttpPost request = new HttpPost(uri);
         MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
         entityBuilder.addPart("file", new FileBody(file, ContentType.DEFAULT_BINARY, file.getName()));
-        request.setEntity(entityBuilder.build());
+        request.setEntity((org.apache.http.HttpEntity) entityBuilder.build());
 
         // Sending the request and returning the response
         return sendRequest(request);
@@ -134,7 +142,7 @@ public class ZenodoRequest {
         // Creating an HTTP PUT request and setting up the new file name
         HttpPut request = new HttpPut(uri);
         StringBody stringBody = new StringBody(newFileName, ContentType.TEXT_PLAIN);
-        request.setEntity(stringBody);
+        request.setEntity((HttpEntity) stringBody);
 
         // Sending the request and returning the response
         return sendRequest(request);
